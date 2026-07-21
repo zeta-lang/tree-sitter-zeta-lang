@@ -1,0 +1,16 @@
+# Real tree-sitter grammar repos commit the generated src/parser.c,
+# src/grammar.json, and src/node-types.json alongside grammar.js and
+# scanner.c -- downstream consumers (editors, language bindings, Zed's
+# extension builder) compile parser.c + scanner.c directly and generally
+# don't run `tree-sitter generate` themselves. Only truly transient
+# build/install artifacts are ignored here.
+
+node_modules/
+build/
+*.so
+*.dylib
+*.dll
+*.wasm
+/target
+Cargo.lock
+*.log

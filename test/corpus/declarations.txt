@@ -1,0 +1,344 @@
+====================
+Struct declaration
+====================
+
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+---
+
+(source_file
+  (struct_declaration
+    name: (identifier)
+    body: (struct_body
+      (field_declaration name: (identifier) type: (primitive_type))
+      (field_declaration name: (identifier) type: (primitive_type)))))
+
+====================
+Generic struct declaration
+====================
+
+public struct Point<T> {
+    x: i32,
+    tag: T,
+}
+
+---
+
+(source_file
+  (struct_declaration
+    visibility: (visibility)
+    name: (identifier)
+    generics: (generic_parameters (generic_parameter name: (identifier)))
+    body: (struct_body
+      (field_declaration name: (identifier) type: (primitive_type))
+      (field_declaration name: (identifier) type: (named_type name: (identifier))))))
+
+====================
+Tuple struct declaration
+====================
+
+struct Pair(i32, i32);
+
+---
+
+(source_file
+  (struct_declaration
+    name: (identifier)
+    fields: (tuple_struct_fields
+      (tuple_field type: (primitive_type))
+      (tuple_field type: (primitive_type)))))
+
+====================
+Enum with struct variants
+====================
+
+enum Shape {
+    Circle { radius: f64 },
+    Empty,
+}
+
+---
+
+(source_file
+  (enum_declaration
+    name: (identifier)
+    (enum_variant
+      name: (identifier)
+      (field_declaration_no_trailing name: (identifier) type: (primitive_type)))
+    (enum_variant name: (identifier))))
+
+====================
+Impl block with generics and const
+====================
+
+impl<T> Point<T> {
+    const MAX: i32 = 100;
+
+    func new(x: i32): Point<T> {
+        return Point { x: x };
+    }
+}
+
+---
+
+(source_file
+  (impl_declaration
+    generics: (generic_parameters (generic_parameter name: (identifier)))
+    target: (named_type name: (identifier) generics: (type_arguments (named_type name: (identifier))))
+    body: (impl_body
+      (const_statement name: (identifier) type: (primitive_type) value: (number_literal))
+      (function_declaration
+        signature: (function_signature
+          name: (identifier)
+          parameters: (parameters (normal_parameter name: (identifier) type: (primitive_type)))
+          return_type: (named_type name: (identifier) generics: (type_arguments (named_type name: (identifier)))))
+        body: (block
+          (return_statement
+            value: (struct_init_expression
+              type: (identifier)
+              body: (struct_init_body (field_init name: (identifier) value: (identifier))))))))))
+
+====================
+Impl by interface
+====================
+
+impl Point by Drawable {
+    func draw(&this) { }
+}
+
+---
+
+(source_file
+  (impl_declaration
+    target: (named_type name: (identifier))
+    interface: (named_type name: (identifier))
+    body: (impl_body
+      (function_declaration
+        signature: (function_signature
+          name: (identifier)
+          parameters: (parameters (this_parameter)))
+        body: (block)))))
+
+====================
+Sealed interface with permits
+====================
+
+sealed interface Sealed permits A, B, C {
+    func method(&this);
+}
+
+---
+
+(source_file
+  (interface_declaration
+    name: (identifier)
+    permits: (permits_clause
+      (named_type name: (identifier))
+      (named_type name: (identifier))
+      (named_type name: (identifier)))
+    (interface_method
+      signature: (function_signature
+        name: (identifier)
+        parameters: (parameters (this_parameter))))))
+
+====================
+Generic function call vs comparison
+====================
+
+func f(a: i32, b: i32) {
+    let cmp: bool = a < b;
+    let call: i32 = identity<i32>(5);
+}
+
+---
+
+(source_file
+  (function_declaration
+    signature: (function_signature
+      name: (identifier)
+      parameters: (parameters
+        (normal_parameter name: (identifier) type: (primitive_type))
+        (normal_parameter name: (identifier) type: (primitive_type))))
+    body: (block
+      (let_statement
+        name: (identifier)
+        type: (primitive_type)
+        value: (comparison_expression left: (identifier) right: (identifier)))
+      (let_statement
+        name: (identifier)
+        type: (primitive_type)
+        value: (call_expression
+          (generic_callee
+            function: (identifier)
+            type_arguments: (generic_arguments (generic_open) (primitive_type)))
+          arguments: (arguments (number_literal)))))))
+
+====================
+Match statement disallows struct-init on subject
+====================
+
+func f(x: i32) {
+    match x {
+        case 0 -> { panic "zero"; }
+        case n if n < 0 -> { return; }
+        case _ -> { return; }
+    }
+}
+
+---
+
+(source_file
+  (function_declaration
+    signature: (function_signature
+      name: (identifier)
+      parameters: (parameters (normal_parameter name: (identifier) type: (primitive_type))))
+    body: (block
+      (match_statement
+        subject: (identifier)
+        (match_arm
+          pattern: (number_literal)
+          body: (block (panic_statement message: (string_literal))))
+        (match_arm
+          pattern: (identifier_pattern (identifier))
+          guard: (comparison_expression left: (identifier) right: (number_literal))
+          body: (block (return_statement)))
+        (match_arm
+          pattern: (wildcard_pattern)
+          body: (block (return_statement)))))))
+
+====================
+Reference provenance annotations
+====================
+
+func f(world: &world Player, self_ref: &this.world Player) { }
+
+---
+
+(source_file
+  (function_declaration
+    signature: (function_signature
+      name: (identifier)
+      parameters: (parameters
+        (normal_parameter
+          name: (identifier)
+          type: (reference_type
+            provenance: (provenance_annotation (identifier))
+            element: (named_type name: (identifier))))
+        (normal_parameter
+          name: (identifier)
+          type: (reference_type
+            provenance: (provenance_annotation field: (identifier))
+            element: (named_type name: (identifier))))))
+    body: (block)))
+
+====================
+Catch and nullable unwrap
+====================
+
+func f() {
+    let result: i32 = mightFail() catch (Error e) => {
+        return;
+    };
+
+    let value: i32 = mightBeNull() ? else {
+        return;
+    };
+}
+
+---
+
+(source_file
+  (function_declaration
+    signature: (function_signature name: (identifier) parameters: (parameters))
+    body: (block
+      (let_statement
+        name: (identifier)
+        type: (primitive_type)
+        value: (call_expression function: (identifier) arguments: (arguments))
+        catch: (catch_clause
+          (catch_single
+            error_type: (named_type name: (identifier))
+            binding: (identifier)
+            body: (block (return_statement)))))
+      (let_statement
+        name: (identifier)
+        type: (primitive_type)
+        value: (call_expression function: (identifier) arguments: (arguments))
+        else: (else_unwrap_clause body: (block (return_statement)))))))
+
+====================
+Equality binds looser than relational comparison
+====================
+
+func f(a: bool, b: bool, c: bool) {
+    let x: bool = a == b < c;
+}
+
+---
+
+(source_file
+  (function_declaration
+    signature: (function_signature
+      name: (identifier)
+      parameters: (parameters
+        (normal_parameter name: (identifier) type: (primitive_type))
+        (normal_parameter name: (identifier) type: (primitive_type))
+        (normal_parameter name: (identifier) type: (primitive_type))))
+    body: (block
+      (let_statement
+        name: (identifier)
+        type: (primitive_type)
+        value: (comparison_expression
+          left: (identifier)
+          right: (comparison_expression left: (identifier) right: (identifier)))))))
+
+====================
+Logical and/or precedence
+====================
+
+func f(a: bool, b: bool, c: bool) {
+    let x: bool = a || b && c;
+    let y: bool = a && b == c;
+}
+
+---
+
+(source_file
+  (function_declaration
+    signature: (function_signature
+      name: (identifier)
+      parameters: (parameters
+        (normal_parameter name: (identifier) type: (primitive_type))
+        (normal_parameter name: (identifier) type: (primitive_type))
+        (normal_parameter name: (identifier) type: (primitive_type))))
+    body: (block
+      (let_statement
+        name: (identifier)
+        type: (primitive_type)
+        value: (binary_expression
+          left: (identifier)
+          right: (binary_expression left: (identifier) right: (identifier))))
+      (let_statement
+        name: (identifier)
+        type: (primitive_type)
+        value: (binary_expression
+          left: (identifier)
+          right: (comparison_expression left: (identifier) right: (identifier)))))))
+
+====================
+Nested block comments
+====================
+
+/* outer /* inner */ still outer */
+func f() { }
+
+---
+
+(source_file
+  (block_comment)
+  (function_declaration
+    signature: (function_signature name: (identifier) parameters: (parameters))
+    body: (block)))

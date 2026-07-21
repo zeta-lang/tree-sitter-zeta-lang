@@ -1,0 +1,102 @@
+// line comment
+/* block /* nested */ comment */
+
+package com::wildered::zeta;
+
+import std::collections;
+
+public struct Point<T> {
+    x: i32,
+    y: i32,
+    tag: T,
+}
+
+struct Pair(i32, i32);
+
+enum Shape<T> {
+    Circle { radius: f64 },
+    Square { side: f64 },
+    Empty,
+}
+
+interface Drawable {
+    func draw(&this);
+}
+
+sealed interface Sealed permits A, B, C {
+    func method(&this);
+}
+
+impl<T> Point<T> {
+    const MAX: i32 = 100;
+
+    public func new(x: i32, y: i32, tag: T): Point<T> {
+        return Point<T> { x: x, y: y, tag: tag };
+    }
+
+    func area(&this): i32 {
+        let mut total: i32 = 0;
+        for (let mut i: i32 = 0; i < 10; i += 1) {
+            total = total + i;
+        }
+        return total;
+    }
+}
+
+impl Point<i32> by Drawable {
+    func draw(&this) {
+        panic "not implemented";
+    }
+}
+
+func identity<T>(value: T): T {
+    return value;
+}
+
+func compare(a: i32, b: i32): bool {
+    return a < b;
+}
+
+func makeArray(): [3]i32 {
+    let arr: [3]i32 = [1, 2, 3];
+    return arr;
+}
+
+func borrowStuff(world: &world Player, self_ref: &this.world Player) {
+}
+
+func withCatch() {
+    let result: i32 = mightFail() catch (Error e) => {
+        return;
+    };
+
+    let value: i32 = mightBeNull() ? else {
+        return;
+    };
+}
+
+func lambdas() {
+    let add := func(a, b) {
+        return a + b;
+    };
+
+    let f: func(i32, i32) -> i32 = add;
+}
+
+func matching(x: i32) {
+    match x {
+        case 0 -> { panic "zero"; }
+        case n if n < 0 -> { return; }
+        case _ -> { return; }
+    }
+}
+
+func generics_and_comparisons(a: i32, b: i32) {
+    let cmp: bool = a < b;
+    let call: i32 = identity<i32>(5);
+    let generic_struct := Point<i32> { x: 1, y: 2, tag: 0 };
+}
+
+module Utils {
+    public func helper(): void {}
+}

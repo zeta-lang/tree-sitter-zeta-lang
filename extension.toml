@@ -1,0 +1,13 @@
+id = "zeta"
+name = "Zeta"
+version = "0.0.1"
+schema_version = 1
+authors = ["Wildered"]
+description = "Zeta language support: syntax highlighting, outline, brackets, indentation"
+repository = "https://github.com/Voxon-Development/tree-sitter-zeta-lang"
+
+[grammars.zeta]
+# Points at this same repo. Replace `repository` with your real GitHub URL
+# and `rev` with the commit SHA you want Zed to build from (see SETUP.md).
+repository = "https://github.com/Voxon-Development/tree-sitter-zeta-lang"
+rev = "REPLACE_WITH_COMMIT_SHA"

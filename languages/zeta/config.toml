@@ -1,0 +1,6 @@
+name = "Zeta"
+grammar = "zeta"
+path_suffixes = ["zt", "zeta"]
+line_comments = ["// "]
+tab_size = 4
+hard_tabs = false

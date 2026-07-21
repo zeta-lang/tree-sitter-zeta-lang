@@ -1,0 +1,38 @@
+{
+  "grammars": [
+    {
+      "name": "zeta",
+      "camelcase": "Zeta",
+      "scope": "source.zeta",
+      "path": ".",
+      "file-types": [
+        "zeta"
+      ],
+      "highlights": "queries/highlights.scm",
+      "injections": "queries/injections.scm",
+      "locals": "queries/locals.scm",
+      "tags": "queries/tags.scm"
+    }
+  ],
+  "metadata": {
+    "version": "0.2.0-alpha",
+    "license": "MIT",
+    "description": "Zeta language grammar for tree-sitter",
+    "authors": [
+      {
+        "name": "Wildered"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/Voxon-Development/tree-sitter-zeta-lang"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": false,
+    "node": true,
+    "python": false,
+    "rust": true,
+    "swift": false
+  }
+}
