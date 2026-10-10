@@ -1,9 +1,20 @@
-(block "}" @end) @indent
-(struct_body "}" @end) @indent
-(impl_body "}" @end) @indent
-(struct_init_body "}" @end) @indent
-(arguments ")" @end) @indent
-(parameters ")" @end) @indent
-(array_literal "]" @end) @indent
-(match_statement "}" @end) @indent
-(catch_multiple "}" @end) @indent
+[
+  (block)
+  (struct_body)
+  (struct_init_body)
+  (interface_body)
+  (impl_body)
+  (match_expression)
+  (catch_multiple)
+  (arguments)
+  (parameters)
+  (array_literal)
+  (tuple_expression)
+  (tuple_struct_fields)
+] @indent
+
+[
+  "}"
+  ")"
+  "]"
+] @outdent
